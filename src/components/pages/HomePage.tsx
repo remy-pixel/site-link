@@ -163,7 +163,7 @@ export default function HomePage() {
             className="relative w-full h-full overflow-hidden bg-mutedgray/20"
           >
             <Image
-              src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=1"
+              src="https://static.wixstatic.com/media/c9b5f3_a9757547181e43649ec1ee91fe096176~mv2.png?originWidth=1152&originHeight=640"
               alt="Featured design showcase"
               className="w-full h-full object-cover"
               width={1200}
@@ -219,7 +219,7 @@ export default function HomePage() {
               {/* Block 2 - Image Break */}
               <div className="h-[60vh] w-full relative overflow-hidden border-b border-subtleborder/40 group">
                 <ParallaxImage 
-                  src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=2"
+                  src="https://static.wixstatic.com/media/c9b5f3_b7599f48313f433d9244fa89b1784f1e~mv2.png?originWidth=1600&originHeight=960"
                   alt="Detail shot of design materials"
                   className="w-full h-full"
                 />
@@ -282,7 +282,7 @@ export default function HomePage() {
       */}
       <section className="w-full h-[80vh] relative overflow-hidden">
         <ParallaxImage 
-          src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=3"
+          src="https://static.wixstatic.com/media/c9b5f3_a261437c338e46839cbbfc9310c18229~mv2.png?originWidth=1600&originHeight=1280"
           alt="Atmospheric interior shot"
           className="w-full h-full"
         />
