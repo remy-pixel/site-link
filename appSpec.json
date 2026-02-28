@@ -1,0 +1,234 @@
+{
+  "id": "2a48fee7-1ce6-400e-8556-98ca164012f7",
+  "initialPrompt": "Create a website inspired by https://www.stratocs.com/",
+  "siteName": "stratocs.com",
+  "brandBook": {
+    "tones": [
+      "Confident",
+      "Data-Driven",
+      "Authoritative",
+      "Professional",
+      "Modern",
+      "Strategic",
+      "Performance-Oriented"
+    ],
+    "designStyle": {
+      "primaryStyle": [
+        "Minimalist",
+        "Modern",
+        "Tech-Inspired"
+      ],
+      "supportingStyles": [
+        "Clean",
+        "Spacious",
+        "Authoritative",
+        "Premium"
+      ]
+    },
+    "toneOfVoice": "Confident, data-driven, and authoritative, positioning StratoCS as a leader in digital performance and systems engineering.",
+    "graphicElements": {
+      "icons": "Minimalist, line-based icons with a consistent stroke weight, matching the primary or accent color palette. Used to denote services, process steps, and key features.",
+      "stickers": "",
+      "illustrations": "Abstract geometric shapes, subtle data visualizations, or clean, futuristic line art. Avoid literal or overly complex illustrations. Focus on conveying concepts of systems, data, and connectivity."
+    },
+    "designSummary": "**The Digital Forge: Precision Engineered for Performance**\n\nThe Vision: We are crafting a digital presence that embodies the essence of a high-performance engineering firm. This isn't just a website; it's a demonstration of our capability to build robust, scalable, and authoritative digital systems. The design will be a fusion of minimalist elegance and cutting-edge technological sophistication, reflecting our commitment to data-driven results and strategic growth for our clients.\n\n**Execution Blueprint:**\n1. The Grid as a Foundation, Not a Constraint: A strict 12-column grid will provide underlying order, but elements will intentionally break boundaries to create visual dynamism and emphasize key content.\n2. Typography as the Primary Interface: Headlines will be bold, commanding statements, acting as structural anchors. Body text will be highly legible and spacious, ensuring clarity and a premium reading experience.\n3. The 8-Pixel Rhythm: All spacing, padding, and margins will adhere to an 8px base unit, ensuring a harmonious and professional rhythm across the entire interface.\n4. Subtle Tech Accents: Instead of overt gradients, we will use fine, precise lines, subtle glows, and carefully placed geometric elements to evoke a sense of advanced technology and precision engineering.\n5. Dark Mode Dominance: A sophisticated dark background will be the primary canvas, allowing vibrant accent colors and crisp typography to stand out, creating an authoritative and modern feel.",
+    "layout": {
+      "grid": {
+        "margins": "Generous, typically multiples of the 8px base unit, creating breathing room around sections and elements.",
+        "padding": "Consistent, typically 24px or 40px within containers and sections, ensuring content is well-framed.",
+        "compositionApproach": "Broken Grid with Overlapping and Bleeding Elements",
+        "spacing": {
+          "gaps": "Base unit: 8px. All grid gaps are 24px (3x base unit).",
+          "rows": "Flexible, based on content and visual rhythm",
+          "columns": "12-column grid system",
+          "compositionApproach": "Not specified"
+        }
+      },
+      "layoutDna": {
+        "contrastSpectrum": "High contrast, primarily using a dark background with bright accent colors and crisp typography.",
+        "densitySpectrum": "Spacious, with generous negative space to emphasize content and create a premium feel.",
+        "textVsImageEmphasis": "Balanced, with strong typography taking center stage, complemented by high-quality, relevant imagery or abstract tech visuals.",
+        "complexitySpectrum": "Minimalist and clean, avoiding clutter. Complexity is introduced through subtle layering, precise animations, and thoughtful element placement rather than visual noise.",
+        "gridAlignmentSpectrum": "Intentionally broken grid, using a 12-column system as a guide but allowing elements to overlap and extend for visual interest and emphasis.",
+        "negativeSpaceUsage": "Extensive use of negative space to frame content, improve readability, and convey a sense of calm, focused professionalism."
+      },
+      "heroSectionLayout": "**Digital Infrastructure for Modern Businesses**\nComposition (Tailwind Spec): Main container (h-screen grid place-items-center p-8). Headline 'Digital Infrastructure for Modern Businesses' (syne text-8xl font-bold leading-tight). Subheadline 'We engineer websites, automation, and performance systems that drive measurable growth and operational efficiency.' (space-grotesk text-lg leading-relaxed mt-4). Primary CTA 'Book a Strategy Call' (syne text-xl font-semibold px-8 py-4 rounded-lg bg-primary text-primaryForeground). Secondary CTA 'View Our Work' (space-grotesk text-xl font-medium px-8 py-4 rounded-lg border-2 border-accentGrey text-accentGrey hover:bg-accentGrey hover:text-secondary).\nSignature Hook (Framer Motion Spec): Parent `motion.div` for hero content uses `variants` with `transition: { staggerChildren: 0.05 }`. Headline `motion.h1` has `initial={{ opacity: 0, y: 30 }}` and `animate={{ opacity: 1, y: 0 }}`. Subheadline and CTAs follow with similar stagger animations."
+    },
+    "components": {
+      "images": "Layout Role: Asymmetrical placement, overlapping adjacent content blocks by 10-20% to create depth and visual interest. | Gallery Type: Dynamic Mosaic Grid: A responsive grid of images and potentially videos, where modules vary in size (e.g., 1x1, 1x2, 2x1) to create an engaging, non-uniform layout. Images should fill their containers with a subtle zoom effect on hover.",
+      "buttons": "Primary: background-color: #007AFF, color: #FFFFFF, border-radius: 8px, padding: 16px 32px, font-weight: 600, transition: background-color 0.3s ease. Secondary: background-color: transparent, color: #C2C2C2, border: 2px solid #C2C2C2, border-radius: 8px, padding: 16px 32px, font-weight: 500, transition: background-color 0.3s ease, color 0.3s ease.",
+      "containers": "Method: Whitespace and subtle background variations. Style: Sections are separated by generous vertical margins (e.g., 80px or 120px). Card-like elements use a muted background (#2A2A2A) with subtle rounded corners (12px) and no harsh shadows, relying on spacing and typography for definition."
+    },
+    "palette": {
+      "colors": {
+        "customColors": [
+          {
+            "name": "destructive",
+            "value": "#FF4535"
+          },
+          {
+            "name": "destructiveForeground",
+            "value": "#FFFFFF"
+          },
+          {
+            "name": "accentBlue",
+            "value": "#007AFF"
+          },
+          {
+            "name": "accentGrey",
+            "value": "#C2C2C2"
+          },
+          {
+            "name": "darkBackground",
+            "value": "#121212"
+          },
+          {
+            "name": "lightForeground",
+            "value": "#E0E0E0"
+          },
+          {
+            "name": "mutedBackground",
+            "value": "#2A2A2A"
+          }
+        ],
+        "background": "#121212",
+        "secondary": "#333333",
+        "foreground": "#E0E0E0",
+        "secondaryForeground": "#FFFFFF",
+        "primaryForeground": "#FFFFFF",
+        "primary": "#007AFF"
+      },
+      "paletteUsageGuide": "The dark background (#121212) provides a sophisticated canvas. Primary blue (#007AFF) is used for key calls to action, links, and active states. Secondary dark grey (#333333) is for less critical interactive elements or backgrounds. Light grey (#C2C2C2) serves as an accent for secondary CTAs or subtle highlights. White (#FFFFFF) and light grey (#E0E0E0) are used for text and UI elements to ensure high contrast and legibility against dark backgrounds. Custom colors like 'mutedBackground' (#2A2A2A) can be used for card backgrounds or section dividers.",
+      "paletteAccessibilityNotes": "Ensures high contrast ratios between text and background colors, particularly for primary and foreground elements, adhering to WCAG AA standards. Primary blue (#007AFF) on dark background (#121212) has a contrast ratio of 4.5:1. White text (#FFFFFF) on dark background (#121212) has a contrast ratio of 11.3:1. Destructive red (#FF4535) on white text (#FFFFFF) has a contrast ratio of 4.3:1."
+    },
+    "typography": {
+      "headings": {
+        "font": {
+          "fontFamily": "syne",
+          "role": "headings",
+          "fontJustification": ""
+        },
+        "headingsAccessibilityNotes": "Font 'syne' is chosen for its strong geometric presence. Ensure sufficient size and weight for all heading levels to be easily distinguishable from body text.",
+        "headingsSimilarFonts": [],
+        "headingsUsageGuide": "Headings should be used for titles and sub-titles, establishing a clear hierarchy. Use 'syne' in bold weights for maximum impact. Ensure generous line height for readability."
+      },
+      "paragraphs": {
+        "font": {
+          "fontFamily": "space grotesk",
+          "role": "paragraphs",
+          "fontJustification": ""
+        },
+        "paragraphsUsageGuide": "Paragraph text should use 'space grotesk' in regular or medium weights. Maintain ample line spacing and letter spacing for comfortable reading on digital screens. Avoid long blocks of text; break content into digestible sections.",
+        "paragraphsSimilarFonts": [],
+        "paragraphsAccessibilityNotes": "Font 'space grotesk' is selected for its excellent legibility and modern, tech-inspired aesthetic. Ensure adequate contrast with the background and appropriate font sizes for all users."
+      },
+      "customFontFamilies": {},
+      "fontSizes": [
+        {
+          "name": "xs",
+          "size": "0.75rem",
+          "lineHeight": "1.25",
+          "letterSpacing": "0.02em",
+          "fontWeight": "400"
+        },
+        {
+          "name": "sm",
+          "size": "0.875rem",
+          "lineHeight": "1.3",
+          "letterSpacing": "0.02em",
+          "fontWeight": "400"
+        },
+        {
+          "name": "base",
+          "size": "1rem",
+          "lineHeight": "1.5",
+          "letterSpacing": "0.02em",
+          "fontWeight": "400"
+        },
+        {
+          "name": "lg",
+          "size": "1.125rem",
+          "lineHeight": "1.4",
+          "letterSpacing": "0.02em",
+          "fontWeight": "400"
+        },
+        {
+          "name": "xl",
+          "size": "1.25rem",
+          "lineHeight": "1.35",
+          "letterSpacing": "0.02em",
+          "fontWeight": "500"
+        },
+        {
+          "name": "2xl",
+          "size": "1.5rem",
+          "lineHeight": "1.3",
+          "letterSpacing": "0.02em",
+          "fontWeight": "500"
+        },
+        {
+          "name": "3xl",
+          "size": "1.875rem",
+          "lineHeight": "1.25",
+          "letterSpacing": "0.01em",
+          "fontWeight": "600"
+        },
+        {
+          "name": "4xl",
+          "size": "2.25rem",
+          "lineHeight": "1.2",
+          "letterSpacing": "0.01em",
+          "fontWeight": "600"
+        },
+        {
+          "name": "5xl",
+          "size": "3rem",
+          "lineHeight": "1.15",
+          "letterSpacing": "0.005em",
+          "fontWeight": "700"
+        },
+        {
+          "name": "6xl",
+          "size": "3.75rem",
+          "lineHeight": "1.1",
+          "letterSpacing": "0.005em",
+          "fontWeight": "700"
+        },
+        {
+          "name": "7xl",
+          "size": "4.5rem",
+          "lineHeight": "1.05",
+          "letterSpacing": "0.002em",
+          "fontWeight": "800"
+        },
+        {
+          "name": "8xl",
+          "size": "6rem",
+          "lineHeight": "1.0",
+          "letterSpacing": "0.001em",
+          "fontWeight": "800"
+        },
+        {
+          "name": "9xl",
+          "size": "8rem",
+          "lineHeight": "1.0",
+          "letterSpacing": "0.001em",
+          "fontWeight": "900"
+        }
+      ],
+      "welcomeSectionTypography": {
+        "placement": "Centered within the hero section, commanding attention.",
+        "implementation": "Headline: 'Digital Infrastructure for Modern Businesses' (syne, 8xl, font-bold). Subheadline: 'We engineer websites, automation, and performance systems that drive measurable growth and operational efficiency.' (space grotesk, lg, font-normal). Primary CTA: 'Book a Strategy Call' (syne, xl, font-semibold). Secondary CTA: 'View Our Work' (space grotesk, xl, font-medium)."
+      }
+    },
+    "originImagesUrls": []
+  },
+  "attachments": {
+    "contentImagesUrls": [],
+    "inspirationImagesUrls": [
+      "https://wixmp-c562ea68f10846b458285ce5.wixmp.com/scraped-screenshots/screenshot-1772275469223.webp"
+    ]
+  },
+  "status": "READY",
+  "plan": "\n\n```json\n{\n  \"sections\": [\n    {\n      \"id\": \"overview\",\n      \"title\": \"## Overview\",\n      \"content\": \"A premium digital agency website for StratoCS that showcases website design, automation systems, and performance optimization services with a modern, authoritative design.\"\n    },\n    {\n      \"id\": \"key-features\",\n      \"title\": \"## Key features\",\n      \"content\": \"- **View Service Offerings**: Browse detailed service categories including website design, automation, and performance optimization.\\n- **View Case Studies**: Explore client results and performance metrics.\\n- **View Process Steps**: Understand the agency's methodology from audit to scale.\\n- **View Pricing Packages**: Compare service tiers and features.\\n- **Submit Strategy Call Request**: Book a consultation through a contact form.\\n- **View Company Information**: Learn about StratoCS's positioning and approach.\",\n      \"metadata\": [\n        { \"id\": \"view-service-offerings\", \"name\": \"View Service Offerings\" },\n        { \"id\": \"view-case-studies\", \"name\": \"View Case Studies\" },\n        { \"id\": \"view-process-steps\", \"name\": \"View Process Steps\" },\n        { \"id\": \"view-pricing-packages\", \"name\": \"View Pricing Packages\" },\n        { \"id\": \"submit-strategy-call-request\", \"name\": \"Submit Strategy Call Request\" },\n        { \"id\": \"view-company-information\", \"name\": \"View Company Information\" }\n      ]\n    },\n    {\n      \"id\": \"structure\",\n      \"title\": \"## Structure\",\n      \"content\": \"- **Header (Reusable)**: Contains StratoCS logo and navigation links to Home, Services, Case Studies, About, and Contact.\\n- **Home Page**: Features hero section with primary and secondary CTAs, services overview, process steps, case study highlights, why StratoCS section, and pricing packages overview.\\n- **Services Page**: Detailed breakdown of all service categories with descriptions and benefits.\\n- **Case Studies Page**: Showcases client results with performance metrics and testimonials.\\n- **About Page**: Explains StratoCS positioning, team approach, and company values.\\n- **Contact Page**: Strategy call booking section with contact form and company contact information.\\n- **Footer (Reusable)**: Contains quick links, service categories, contact information, and social media links.\"\n    }\n  ],\n  \"apps\": [\n    {\n      \"id\": \"wix-cms\",\n      \"keyFeatures\": [\n        { \"id\": \"view-service-offerings\", \"name\": \"View Service Offerings\" },\n        { \"id\": \"view-case-studies\", \"name\": \"View Case Studies\" },\n        { \"id\": \"view-process-steps\", \"name\": \"View Process Steps\" },\n        { \"id\": \"view-pricing-packages\", \"name\": \"View Pricing Packages\" },\n        { \"id\": \"submit-strategy-call-request\", \"name\": \"Submit Strategy Call Request\" },\n        { \"id\": \"view-company-information\", \"name\": \"View Company Information\" }\n      ]\n    }\n  ],\n  \"version\": \"4.0.1\"\n}\n```"
+}
