@@ -3,8 +3,12 @@ import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-rou
 import { ScrollToTop } from '@/lib/scroll-to-top';
 import ErrorPage from '@/integrations/errorHandlers/ErrorPage';
 import HomePage from '@/components/pages/HomePage';
+import ServicesPage from '@/components/pages/ServicesPage';
 import AboutPage from '@/components/pages/AboutPage';
 import ContactPage from '@/components/pages/ContactPage';
+import TermsAndConditionsPage from '@/components/pages/TermsAndConditionsPage';
+import PrivacyPolicyPage from '@/components/pages/PrivacyPolicyPage';
+import AccessibilityStatementPage from '@/components/pages/AccessibilityStatementPage';
 
 // Layout component that includes ScrollToTop
 function Layout() {
@@ -30,6 +34,13 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: "services",
+        element: <ServicesPage />,
+        routeMetadata: {
+          pageIdentifier: 'services',
+        },
+      },
+      {
         path: "about",
         element: <AboutPage />,
         routeMetadata: {
@@ -41,6 +52,27 @@ const router = createBrowserRouter([
         element: <ContactPage />,
         routeMetadata: {
           pageIdentifier: 'contact',
+        },
+      },
+      {
+        path: "terms-and-conditions",
+        element: <TermsAndConditionsPage />,
+        routeMetadata: {
+          pageIdentifier: 'terms-and-conditions',
+        },
+      },
+      {
+        path: "privacy-policy",
+        element: <PrivacyPolicyPage />,
+        routeMetadata: {
+          pageIdentifier: 'privacy-policy',
+        },
+      },
+      {
+        path: "accessibility-statement",
+        element: <AccessibilityStatementPage />,
+        routeMetadata: {
+          pageIdentifier: 'accessibility-statement',
         },
       },
       {
