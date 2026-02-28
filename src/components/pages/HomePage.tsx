@@ -1,338 +1,537 @@
-// HPI 1.7-V
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, useInView, MotionValue } from 'framer-motion';
-import { ArrowRight, ArrowDown, Star, Shield, Clock, MoveRight } from 'lucide-react';
-import { Image } from '@/components/ui/image';
-import Header from '@/components/Header';
+// WI-HPI
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Image } from '@/components/ui/image';
+import { Input } from '@/components/ui/input';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Textarea } from '@/components/ui/textarea';
+import type { CaseStudies, PricingPackages, Services } from '@/entities';
+import { BaseCrudService } from '@/integrations';
+import { motion, useInView } from 'framer-motion';
+import {
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  ChevronRight,
+  Code,
+  Globe,
+  Layout,
+  Send,
+  Zap
+} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-// --- Types & Interfaces ---
-interface FeatureItem {
-  id: number;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-}
+// --- Animation Components ---
 
-interface ParallaxImageProps {
-  src: string;
-  alt: string;
+const FadeIn: React.FC<{
+  children: React.ReactNode;
+  delay?: number;
+  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
   className?: string;
-  priority?: boolean;
-}
+  fullWidth?: boolean;
+}> = ({ children, delay = 0, direction = 'up', className = '', fullWidth = false }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
-// --- Canonical Data Sources ---
-const FEATURES_DATA: FeatureItem[] = [
-  {
-    id: 1,
-    title: "Timeless Design",
-    description: "We create designs that transcend trends, focusing on enduring beauty and functionality.",
-    icon: Clock
-  },
-  {
-    id: 2,
-    title: "Attention to Detail",
-    description: "Every element is carefully considered to ensure a cohesive and refined experience.",
-    icon: Star
-  },
-  {
-    id: 3,
-    title: "Lasting Impact",
-    description: "Our work is designed to make a meaningful impression that resonates over time.",
-    icon: Shield
-  }
-];
-
-// --- Helper Components ---
-
-const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className, priority = false }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  
-  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.1]);
+  const directionOffset = {
+    up: { y: 40, x: 0 },
+    down: { y: -40, x: 0 },
+    left: { x: 40, y: 0 },
+    right: { x: -40, y: 0 },
+    none: { x: 0, y: 0 }
+  };
 
   return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.div style={{ y, scale }} className="w-full h-full">
-        <Image
-          src={src}
-          alt={alt}
-          width={1600}
-          className="w-full h-full object-cover"
-        />
-      </motion.div>
-    </div>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, ...directionOffset[direction] }}
+      animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, ...directionOffset[direction] }}
+      transition={{ duration: 0.7, delay: delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className={`${className} ${fullWidth ? 'w-full' : ''}`}
+    >
+      {children}
+    </motion.div>
   );
 };
 
-const RevealText: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = "" }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
-  
+const StaggerContainer: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = ({ children, className = "", delay = 0 }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
   return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.div
-        initial={{ y: "100%" }}
-        animate={isInView ? { y: 0 } : { y: "100%" }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay }}
-      >
-        {children}
-      </motion.div>
-    </div>
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={isInView ? "show" : "hidden"}
+      variants={{
+        hidden: {},
+        show: {
+          transition: {
+            staggerChildren: 0.1,
+            delayChildren: delay,
+          }
+        }
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   );
 };
 
-const Separator = () => (
-  <div className="w-full h-px bg-subtleborder/40" />
-);
+const StaggerItem: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => {
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 // --- Main Component ---
 
 export default function HomePage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  const navigate = useNavigate();
+  const [services, setServices] = useState<Services[]>([]);
+  const [caseStudies, setCaseStudies] = useState<CaseStudies[]>([]);
+  const [pricingPackages, setPricingPackages] = useState<PricingPackages[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  // Form State
+  const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
+  const [message, setMessage] = useState('');
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  // Refs for scrolling
+  const reviewFormRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [servicesData, caseStudiesData, pricingData] = await Promise.all([
+        BaseCrudService.getAll<Services>('services', [], { limit: 6 }),
+        BaseCrudService.getAll<CaseStudies>('casestudies', [], { limit: 3 }),
+        BaseCrudService.getAll<PricingPackages>('pricingpackages', [], { limit: 3 })
+      ]);
+
+      setServices(servicesData.items);
+      setCaseStudies(caseStudiesData.items);
+      setPricingPackages(pricingData.items);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    console.log('Review request:', { email, website, message });
+    setFormStatus('success');
+    setEmail('');
+    setWebsite('');
+    setMessage('');
+
+    setTimeout(() => setFormStatus('idle'), 3000);
+  };
+
+  const scrollToReview = () => {
+    reviewFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <LoadingSpinner className="w-12 h-12 text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-primary overflow-clip selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary-foreground">
       <Header />
+      {/* HERO SECTION */}
+      <section className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden pt-8 sm:pt-12 md:pt-20 px-4">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-[#0A0E1A] z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/5 to-background z-0" />
 
-      {/* --- HERO SECTION --- 
-          Replicating the structure of the inspiration image:
-          Split layout, massive typography left, rounded image right.
-      */}
-      <section className="relative w-full max-w-[120rem] mx-auto min-h-[90vh] flex flex-col lg:flex-row pt-20 lg:pt-0">
-        
-        {/* Left Column: Typography & Info */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 md:p-12 lg:p-16 xl:p-20 z-10">
-          <div className="mt-12 lg:mt-24">
-            <div className="overflow-hidden">
-              <motion.h1 
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                className="font-heading text-6xl md:text-7xl lg:text-8xl xl:text-9xl uppercase leading-[0.9] tracking-tighter text-primary"
-              >
-                Welcome<br />To Our<br />Space
-              </motion.h1>
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mt-12 lg:mt-0">
-            <div className="max-w-xs">
-              <RevealText delay={0.4} className="font-paragraph text-lg md:text-xl text-secondary italic leading-relaxed">
-                Discover a world of possibilities where design meets functionality.
-              </RevealText>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8, duration: 1 }}
-                className="mt-6"
-              >
-                <a href="/about" className="group inline-flex items-center gap-2 text-sm font-heading uppercase tracking-widest border-b border-primary pb-1 hover:text-secondary transition-colors">
-                  Learn More <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </a>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 1 }}
-              className="hidden md:block"
-            >
-               <span className="font-heading text-xs uppercase tracking-widest text-mutedgray">Est. 2024</span>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Right Column: Image */}
-        <div className="w-full lg:w-1/2 h-[60vh] lg:h-auto relative p-4 lg:p-8 flex items-center justify-center">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0, borderRadius: "0px" }}
-            animate={{ scale: 1, opacity: 1, borderRadius: "48px" }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="relative w-full h-full overflow-hidden bg-mutedgray/20"
-          >
-            <Image
-              src="https://static.wixstatic.com/media/c9b5f3_a9757547181e43649ec1ee91fe096176~mv2.png?originWidth=1152&originHeight=640"
-              alt="Featured design showcase"
-              className="w-full h-full object-cover"
-              width={1200}
-            />
-            {/* Subtle overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
-          </motion.div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* --- STICKY NARRATIVE SECTION --- 
-          "Crafted with Purpose" - Using sticky positioning for a magazine-like reading experience.
-      */}
-      <section className="relative w-full max-w-[120rem] mx-auto">
-        <div className="flex flex-col lg:flex-row">
-          {/* Sticky Title */}
-          <div className="w-full lg:w-1/3 lg:h-[150vh] relative">
-            <div className="sticky top-0 h-screen flex flex-col justify-center p-8 md:p-16 border-r border-subtleborder/40">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <span className="block font-heading text-xs uppercase tracking-[0.2em] text-mutedgray mb-4">Our Philosophy</span>
-                <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl uppercase leading-none text-primary">
-                  Crafted<br />With<br />Purpose
-                </h2>
-                <div className="mt-12 w-12 h-12 rounded-full border border-primary flex items-center justify-center animate-bounce">
-                  <ArrowDown className="w-5 h-5" />
-                </div>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Scrolling Content */}
-          <div className="w-full lg:w-2/3 bg-background">
-            <div className="flex flex-col">
-              {/* Block 1 */}
-              <div className="min-h-[50vh] flex items-center p-8 md:p-24 border-b border-subtleborder/40">
-                <div className="max-w-2xl">
-                  <RevealText className="font-paragraph text-2xl md:text-3xl lg:text-4xl text-secondary italic leading-tight mb-8">
-                    "Every detail matters. We believe in creating meaningful experiences that stand the test of time."
-                  </RevealText>
-                  <p className="font-sans text-base md:text-lg text-mutedgray leading-relaxed">
-                    Our approach combines timeless design principles with modern sensibilities to deliver solutions that are both beautiful and functional. We don't just build spaces; we curate atmospheres that breathe and evolve with you.
-                  </p>
-                </div>
-              </div>
-
-              {/* Block 2 - Image Break */}
-              <div className="h-[60vh] w-full relative overflow-hidden border-b border-subtleborder/40 group">
-                <ParallaxImage 
-                  src="https://static.wixstatic.com/media/c9b5f3_b7599f48313f433d9244fa89b1784f1e~mv2.png?originWidth=1600&originHeight=960"
-                  alt="Detail shot of design materials"
-                  className="w-full h-full"
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-black/20 backdrop-blur-[2px]">
-                  <span className="font-heading text-white uppercase tracking-widest text-lg">View Project</span>
-                </div>
-              </div>
-
-              {/* Block 3 */}
-              <div className="min-h-[50vh] flex items-center p-8 md:p-24">
-                <div className="max-w-2xl ml-auto text-right">
-                  <RevealText className="font-paragraph text-2xl md:text-3xl lg:text-4xl text-secondary italic leading-tight mb-8">
-                    "Simplicity is the ultimate sophistication."
-                  </RevealText>
-                  <p className="font-sans text-base md:text-lg text-mutedgray leading-relaxed">
-                    We strip away the unnecessary to reveal the essential. In a world of noise, we offer clarity. Our designs are characterized by clean lines, thoughtful proportions, and a harmonious palette that brings a sense of calm to any environment.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* --- FEATURES GRID --- 
-          Refined grid layout with vertical dividers.
-      */}
-      <section className="w-full max-w-[120rem] mx-auto py-24 md:py-32 px-6 md:px-12">
-        <div className="mb-20 text-center">
-          <span className="font-heading text-xs uppercase tracking-[0.2em] text-mutedgray">Core Values</span>
-          <h3 className="font-heading text-3xl md:text-5xl uppercase mt-4">The Standards</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-b border-subtleborder/40 divide-y md:divide-y-0 md:divide-x divide-subtleborder/40">
-          {FEATURES_DATA.map((feature, index) => (
-            <motion.div 
-              key={feature.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group p-8 md:p-12 lg:p-16 flex flex-col items-center text-center hover:bg-mutedgray/5 transition-colors duration-500"
-            >
-              <div className="mb-8 p-4 rounded-full border border-subtleborder text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                <feature.icon className="w-6 h-6" strokeWidth={1.5} />
-              </div>
-              <h4 className="font-heading text-xl uppercase mb-4 tracking-wide">{feature.title}</h4>
-              <p className="font-paragraph text-lg text-secondary italic leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- VISUAL BREATHER --- 
-          Full bleed parallax section.
-      */}
-      <section className="w-full h-[80vh] relative overflow-hidden">
-        <ParallaxImage 
-          src="https://static.wixstatic.com/media/c9b5f3_a261437c338e46839cbbfc9310c18229~mv2.png?originWidth=1600&originHeight=1280"
-          alt="Atmospheric interior shot"
-          className="w-full h-full"
+        {/* Subtle animated glow */}
+        <motion.div
+          animate={{
+            opacity: [0.3, 0.5, 0.3],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] sm:w-[500px] md:w-[800px] h-[300px] sm:h-[500px] md:h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none"
         />
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center text-white p-8 border border-white/30 backdrop-blur-sm max-w-2xl mx-4"
-          >
-            <h2 className="font-heading text-4xl md:text-6xl uppercase mb-4">Illuminate Your Style</h2>
-            <p className="font-paragraph text-xl md:text-2xl italic">
-              "Light is the first element of design; without it there is no color, form, or texture."
-            </p>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* --- CTA SECTION --- 
-          Minimalist final call to action.
-      */}
-      <section className="w-full max-w-[120rem] mx-auto py-32 md:py-48 px-6 md:px-12 bg-background relative overflow-hidden">
-        {/* Decorative background element */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-subtleborder to-transparent" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <RevealText className="font-heading text-5xl md:text-7xl lg:text-8xl uppercase leading-[0.9] mb-12 text-primary">
-            Ready To<br />Begin?
-          </RevealText>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a 
-              href="/contact"
-              className="group relative overflow-hidden px-10 py-5 bg-primary text-primary-foreground font-heading text-sm uppercase tracking-widest hover:bg-secondary transition-colors duration-300"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Get in Touch <MoveRight className="w-4 h-4" />
-              </span>
-            </a>
-            <a 
-              href="/about"
-              className="px-10 py-5 border border-subtleborder text-secondary font-heading text-sm uppercase tracking-widest hover:border-primary hover:text-primary transition-colors duration-300"
-            >
-              Read Our Story
-            </a>
+        <div className="container mx-auto relative z-10 max-w-5xl">
+          <div className="text-center">
+            <FadeIn delay={0.05} direction="up">
+              <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 md:hidden">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-2xl shadow-primary/30">
+                   <Image
+                     src="https://static.wixstatic.com/media/6d0f2e_754e8835c6ad4a128ba4a340eff000f8~mv2.png"
+                     alt="StratoCS Logo"
+                     width={160}
+                     height={160}
+                     className="w-full h-full object-cover"
+                   />
+                 </div>
+                 <div className="text-left">
+                   <h2 className="text-white font-bold text-3xl sm:text-5xl md:text-7xl leading-tight">StratoCS</h2>
+                 </div>
+               </div>
+            </FadeIn>
+
+            <FadeIn delay={0.1} direction="up">
+              <h1 className="text-white tracking-tight mb-4 sm:mb-6 md:mb-8 text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-weight-normal font-normal leading-tight">
+                Clean websites. Built for growth.
+              </h1>
+            </FadeIn>
+
+            <FadeIn delay={0.3} direction="up">
+              <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 md:mb-12 max-w-2xl mx-auto leading-relaxed px-2">
+                We design, rebuild, and optimize websites so businesses look professional and convert more visitors into leads.
+              </p>
+            </FadeIn>
+
+            <FadeIn delay={0.5} direction="up">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center px-2">
+                <Button
+                  size="lg"
+                  className="h-11 sm:h-12 md:h-14 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base bg-white text-black hover:bg-white/90 hover:scale-105 transition-all duration-300 rounded-md font-medium w-full sm:w-auto"
+                  onClick={scrollToReview}
+                >
+                  Get a FREE Website Review
+                  <ArrowRight className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-11 sm:h-12 md:h-14 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base border-white/20 text-white hover:bg-white/10 hover:text-white hover:border-white/40 transition-all duration-300 rounded-md w-full sm:w-auto"
+                  onClick={() => navigate('/services')}
+                >
+                  View Services
+                </Button>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ delay: 1.5, duration: 2, repeat: Infinity }}
+          className="absolute bottom-6 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 text-muted-foreground/50"
+        >
+
+        </motion.div>
+      </section>
+      {/* FREE REVIEW TEASER SECTION - REDESIGNED */}
+      {/* PAID SERVICES SECTION */}
+      <section className="py-12 sm:py-16 md:py-32 bg-[#0D1221] relative overflow-hidden px-4">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-1/3 h-1/2 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
+
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
+              <FadeIn direction="left">
+                <div>
+                  <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-heading font-bold text-white mb-3 sm:mb-4 md:mb-6">
+                    FREE Website Review
+                  </h2>
+                  <p className="text-xs sm:text-sm md:text-lg text-muted-foreground leading-relaxed mb-4 sm:mb-6 md:mb-8">
+                    Send us your website and we&apos;ll review it within 48 hours.
+                    You&apos;ll receive clear, practical suggestions to improve structure and conversions.
+                  </p>
+                  <p className="text-xs sm:text-sm md:text-lg text-white/80 mb-4 sm:mb-6 md:mb-8">
+                    No commitment required.
+                  </p>
+
+                  <Button
+                    size="lg"
+                    className="h-10 sm:h-11 md:h-12 px-4 sm:px-6 md:px-8 text-xs sm:text-sm md:text-base bg-white text-black hover:bg-white/90 hover:scale-105 transition-all duration-300 rounded-md font-medium w-full sm:w-auto"
+                    onClick={scrollToReview}
+                  >
+                    Request Free Review
+                    <ChevronRight className="ml-1 w-3 h-3 sm:w-4 sm:h-4" />
+                  </Button>
+                </div>
+              </FadeIn>
+
+              <FadeIn direction="right" delay={0.2}>
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-100" />
+                  <Card className="relative bg-[#151B2B] border-white/5 p-4 sm:p-6 md:p-8">
+                    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                      <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          <Code className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-medium text-xs sm:text-sm md:text-base mb-0.5">Code Analysis</h4>
+                          <p className="text-xs text-muted-foreground">Performance & structure check</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          <Layout className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-medium text-xs sm:text-sm md:text-base mb-0.5">UX Review</h4>
+                          <p className="text-xs text-muted-foreground">User journey & layout optimization</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                          <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-medium text-xs sm:text-sm md:text-base mb-0.5">Conversion Tips</h4>
+                          <p className="text-xs text-muted-foreground">Actionable growth strategies</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </FadeIn>
+            </div>
           </div>
         </div>
       </section>
+      <section className="py-12 sm:py-16 md:py-32 bg-[#0A0E1A] px-4">
+        <div className="container mx-auto">
+          <FadeIn className="mb-10 sm:mb-14 md:mb-20 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-4xl font-heading font-bold text-white mb-2 sm:mb-3 md:mb-4">
+              Paid Services
+            </h2>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground">Professional solutions for growing businesses</p>
+          </FadeIn>
 
+          <StaggerContainer className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
+            {services.length > 0 ? (
+              services.slice(0, 3).map((service, index) => (
+                <StaggerItem key={service._id} className="h-full">
+                  <Link to={`/services`} className="block h-full group">
+                    <Card className="h-full bg-gradient-to-br from-[#151B2B] to-[#111625] border-white/10 hover:border-primary/50 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-primary/10 group-hover:bg-gradient-to-br group-hover:from-[#1a2133] group-hover:to-[#151B2B]">
+                      <CardHeader className="pb-4 sm:pb-6">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4 sm:mb-6 group-hover:from-primary/30 group-hover:to-primary/10 transition-all duration-300">
+                          {index === 0 ? <Layout className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" /> :
+                           index === 1 ? <Zap className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" /> :
+                           <Globe className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary" />}
+                        </div>
+                        <CardTitle className="text-lg sm:text-xl md:text-3xl font-bold text-white mb-2 sm:mb-3 group-hover:text-primary transition-colors">
+                          {service.serviceName}
+                        </CardTitle>
+                        {service.tagline && (
+                          <p className="text-primary/80 text-xs sm:text-sm font-medium">{service.tagline}</p>
+                        )}
+                      </CardHeader>
+                      <CardContent className="pb-6 sm:pb-8">
+                        <p className="text-muted-foreground leading-relaxed mb-4 sm:mb-8 text-xs sm:text-sm md:text-base">
+                          {service.description}
+                        </p>
+                        {service.benefits && (
+                          <ul className="space-y-2 sm:space-y-3 md:space-y-4">
+                            {service.benefits.split('\n').slice(0, 4).map((benefit, i) => (
+                              <li key={i} className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground/90">
+                                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary/80 mt-0.5 shrink-0" />
+                                <span>{benefit}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </CardContent>
+                      <CardFooter className="pt-4 sm:pt-6 border-t border-white/5">
+                        <Button variant="link" className="text-primary p-0 h-auto hover:text-primary/80 group-hover:text-primary text-xs sm:text-sm">
+                          Learn more <ArrowRight className="ml-2 w-3 h-3 sm:w-4 sm:h-4" />
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </Link>
+                </StaggerItem>
+              ))
+            ) : (
+              // Fallback if no data (matches screenshot structure)
+              (<>
+                {[
+                  { title: "Website Builds", desc: "We design clean, modern websites built from scratch for growing businesses." },
+                  { title: "Website Improvements", desc: "We redesign and optimize existing websites to improve clarity and conversions." },
+                  { title: "Landing Pages", desc: "High-conversion one-page websites focused on one clear objective." }
+                ].map((item, i) => (
+                  <StaggerItem key={i}>
+                    <Card className="h-full bg-[#111625] border-white/5 p-6 sm:p-8 hover:border-white/10 transition-all duration-300 hover:-translate-y-1">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4">{item.title}</h3>
+                      <p className="text-xs sm:text-sm md:text-base text-muted-foreground">{item.desc}</p>
+                    </Card>
+                  </StaggerItem>
+                ))}
+              </>)
+            )}
+          </StaggerContainer>
+
+          <FadeIn delay={0.4} className="text-center mt-10 sm:mt-12 md:mt-16">
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-white/10 text-white hover:bg-white hover:text-black transition-all duration-300 text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12"
+              onClick={() => navigate('/contact')}
+            >
+              Get in Touch
+            </Button>
+          </FadeIn>
+        </div>
+      </section>
+      {/* REVIEW FORM SECTION (Functional Destination) */}
+      <section id="review-section" ref={reviewFormRef} className="py-12 sm:py-16 md:py-32 bg-background relative px-4">
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent pointer-events-none" />
+
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center">
+              <FadeIn direction="right">
+                <div>
+                  <h2 className="text-xl sm:text-2xl md:text-4xl font-heading font-bold text-white mb-4 sm:mb-5 md:mb-6">
+                    Ready to improve your website?
+                  </h2>
+                  <p className="text-xs sm:text-sm md:text-lg text-muted-foreground mb-6 sm:mb-8">
+                    Fill out the form to get your free, no-obligation review. We'll analyze your design, structure, and conversion potential.
+                  </p>
+
+                  <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <Code className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium text-xs sm:text-sm md:text-base">Code Analysis</h4>
+                        <p className="text-xs text-muted-foreground">Performance & structure check</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <Layout className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium text-xs sm:text-sm md:text-base">UX Review</h4>
+                        <p className="text-xs text-muted-foreground">User journey & layout optimization</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                        <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-white font-medium text-xs sm:text-sm md:text-base">Conversion Tips</h4>
+                        <p className="text-xs text-muted-foreground">Actionable growth strategies</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+
+              <FadeIn direction="left" delay={0.2}>
+                <Card className="bg-[#151B2B] border-white/10 p-4 sm:p-6 md:p-8 shadow-2xl">
+                  {formStatus === 'success' ? (
+                    <div className="text-center py-8 sm:py-10 md:py-12">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                        <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
+                      </div>
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Request Received!</h3>
+                      <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
+                        We'll review your website and get back to you within 48 hours.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleReviewSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
+                      <div>
+                        <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-white mb-1.5 sm:mb-2">
+                          Email Address
+                        </label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="name@company.com"
+                          required
+                          className="bg-[#0A0E1A] border-white/10 text-white placeholder:text-white/20 focus:border-primary focus:ring-primary text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="website" className="block text-xs sm:text-sm font-medium text-white mb-1.5 sm:mb-2">
+                          Website URL
+                        </label>
+                        <Input
+                          id="website"
+                          type="url"
+                          value={website}
+                          onChange={(e) => setWebsite(e.target.value)}
+                          placeholder="https://yourwebsite.com"
+                          required
+                          className="bg-[#0A0E1A] border-white/10 text-white placeholder:text-white/20 focus:border-primary focus:ring-primary text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="message" className="block text-xs sm:text-sm font-medium text-white mb-1.5 sm:mb-2">
+                          Specific Concerns (Optional)
+                        </label>
+                        <Textarea
+                          id="message"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder="What would you like us to focus on?"
+                          rows={3}
+                          className="bg-[#0A0E1A] border-white/10 text-white placeholder:text-white/20 focus:border-primary focus:ring-primary resize-none text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-white text-black hover:bg-white/90 transition-all text-xs sm:text-sm md:text-base h-10 sm:h-11 md:h-12"
+                        disabled={formStatus === 'submitting'}
+                      >
+                        {formStatus === 'submitting' ? (
+                          <LoadingSpinner className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        ) : (
+                          <Send className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                        )}
+                        {formStatus === 'submitting' ? 'Sending...' : 'Get Free Review'}
+                      </Button>
+                    </form>
+                  )}
+                </Card>
+              </FadeIn>
+            </div>
+          </div>
+        </div>
+      </section>
       <Footer />
     </div>
   );
