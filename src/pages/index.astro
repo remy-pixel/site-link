@@ -1,0 +1,38 @@
+---
+// Simple Astro home page
+const title = "My Site";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="container mx-auto p-8">
+      <h1 class="text-4xl font-bold text-center mb-8">
+        Welcome to My Site
+      </h1>
+      <p class="text-lg text-center text-gray-600 mb-8">
+        This is your new Astro site running on GitHub Pages!
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-2">Fast</h2>
+          <p class="text-gray-600">Built with Astro for optimal performance.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-2">Modern</h2>
+          <p class="text-gray-600">Using React and Tailwind CSS.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-2">Live on GitHub</h2>
+          <p class="text-gray-600">Deployed with GitHub Actions!</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
