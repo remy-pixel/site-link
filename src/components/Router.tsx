@@ -3,12 +3,11 @@ import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-rou
 import { ScrollToTop } from '@/lib/scroll-to-top';
 import ErrorPage from '@/integrations/errorHandlers/ErrorPage';
 import HomePage from '@/components/pages/HomePage';
-import ServicesPage from '@/components/pages/ServicesPage';
+import MenuPage from '@/components/pages/MenuPage';
+import OrderPickupPage from '@/components/pages/OrderPickupPage';
+import ReservePage from '@/components/pages/ReservePage';
 import AboutPage from '@/components/pages/AboutPage';
 import ContactPage from '@/components/pages/ContactPage';
-import TermsAndConditionsPage from '@/components/pages/TermsAndConditionsPage';
-import PrivacyPolicyPage from '@/components/pages/PrivacyPolicyPage';
-import AccessibilityStatementPage from '@/components/pages/AccessibilityStatementPage';
 
 // Layout component that includes ScrollToTop
 function Layout() {
@@ -34,10 +33,24 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: "services",
-        element: <ServicesPage />,
+        path: "menu",
+        element: <MenuPage />,
         routeMetadata: {
-          pageIdentifier: 'services',
+          pageIdentifier: 'menu',
+        },
+      },
+      {
+        path: "order-pickup",
+        element: <OrderPickupPage />,
+        routeMetadata: {
+          pageIdentifier: 'order-pickup',
+        },
+      },
+      {
+        path: "reserve",
+        element: <ReservePage />,
+        routeMetadata: {
+          pageIdentifier: 'reserve',
         },
       },
       {
@@ -52,27 +65,6 @@ const router = createBrowserRouter([
         element: <ContactPage />,
         routeMetadata: {
           pageIdentifier: 'contact',
-        },
-      },
-      {
-        path: "terms-and-conditions",
-        element: <TermsAndConditionsPage />,
-        routeMetadata: {
-          pageIdentifier: 'terms-and-conditions',
-        },
-      },
-      {
-        path: "privacy-policy",
-        element: <PrivacyPolicyPage />,
-        routeMetadata: {
-          pageIdentifier: 'privacy-policy',
-        },
-      },
-      {
-        path: "accessibility-statement",
-        element: <AccessibilityStatementPage />,
-        routeMetadata: {
-          pageIdentifier: 'accessibility-statement',
         },
       },
       {

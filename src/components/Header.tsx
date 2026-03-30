@@ -1,100 +1,154 @@
-import { Image } from '@/components/ui/image';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const desktopNavLinks = [
+    { name: 'Menu', path: '/menu' },
+    { name: 'Order', path: '/order-pickup' },
+    { name: 'Reserve', path: '/reserve' },
+  ];
 
-  const closeMenu = () => {
+  const mobileMenuLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Menu', path: '/menu' },
+    { name: 'Order', path: '/order-pickup' },
+    { name: 'Reserve', path: '/reserve' },
+    { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+  const isHomePage = location.pathname === '/';
+  const isBlackHeaderPage = ['/menu', '/order-pickup', '/reserve', '/about', '/contact'].includes(location.pathname);
+  const headerBgColor = isBlackHeaderPage ? 'bg-black-bg' : isHomePage ? 'bg-transparent' : 'bg-cream-bg';
+  const textColor = isBlackHeaderPage ? 'text-white' : isHomePage ? 'text-black' : 'text-black';
+  const textColorSecondary = isBlackHeaderPage ? 'text-white/60 hover:text-white' : isHomePage ? 'text-black/60 hover:text-black' : 'text-black/60 hover:text-black';
+  const hamburgerLineColor = isBlackHeaderPage ? 'bg-white' : 'bg-black';
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        const hamburgerButton = document.querySelector('[aria-label="Toggle menu"]');
+        if (hamburgerButton && !hamburgerButton.contains(event.target as Node)) {
+          setIsMenuOpen(false);
+        }
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isMenuOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
     setIsMenuOpen(false);
-  };
+  }, [location.pathname]);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 md:px-6 py-4 md:py-6 flex items-center justify-between md:justify-center gap-4 md:gap-20">
-        <Link to="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity md:absolute md:left-6">
-          <Image
-            src="https://static.wixstatic.com/media/6d0f2e_b7607d5e5a424d0a928f3908784b6a62~mv2.png"
-            width={8}
-            height={8}
-            className="object-contain"
-            originWidth={30}
-            originHeight={30}
-            alt="StratoCS Logo"
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBgColor}`}>
+      <div className="max-w-[120rem] mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
+        {/* Hamburger Menu Button - Minimalist Design */}
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="w-10 h-10 flex flex-col items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20 rounded transition-all duration-200"
+          aria-label="Toggle menu"
+          aria-expanded={isMenuOpen}
+        >
+          <motion.div
+            animate={isMenuOpen ? { rotate: 45, y: 12 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`w-5 h-px ${hamburgerLineColor}`}
           />
-          <span className="text-xl md:text-3xl font-heading font-bold text-foreground">StratoCS</span>
-        </Link>
+          <motion.div
+            animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className={`w-5 h-px ${hamburgerLineColor}`}
+          />
+          <motion.div
+            animate={isMenuOpen ? { rotate: -45, y: -12 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`w-5 h-px ${hamburgerLineColor}`}
+          />
+        </button>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-12">
-          <Link to="/" className="text-lg font-paragraph text-foreground hover:text-primary transition-colors">
-            Home
-          </Link>
-          <Link to="/services" className="text-lg font-paragraph text-foreground hover:text-primary transition-colors">
-            Services
-          </Link>
-          <Link to="/about" className="text-lg font-paragraph text-foreground hover:text-primary transition-colors">
-            About
-          </Link>
-          <Link to="/contact" className="text-lg font-paragraph text-foreground hover:text-primary transition-colors">
-            Contact
-          </Link>
+        <nav className="hidden md:flex items-center gap-12 mx-auto">
+          {desktopNavLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`font-paragraph text-xs uppercase tracking-[0.15em] transition-colors duration-300 font-light ${
+                isActive(link.path) 
+                  ? 'text-gold-accent' 
+                  : textColorSecondary
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMenu}
-          className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? (
-            <X className="w-6 h-6 text-foreground" />
-          ) : (
-            <Menu className="w-6 h-6 text-foreground" />
-          )}
-        </button>
+        {/* Spacer for desktop */}
+        <div className="hidden md:block w-5"></div>
       </div>
 
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-background border-t border-border">
-          <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
-            <Link
-              to="/"
-              className="text-base font-paragraph text-foreground hover:text-primary transition-colors py-2"
-              onClick={closeMenu}
+      {/* Left Sidebar Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/30 z-40"
+              onClick={() => setIsMenuOpen(false)}
+            />
+
+            {/* Menu Panel - Left Sidebar */}
+            <motion.div
+              ref={menuRef}
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-100%', opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="fixed left-0 top-0 h-screen w-72 bg-white z-40 overflow-y-auto shadow-lg"
             >
-              Home
-            </Link>
-            <Link
-              to="/services"
-              className="text-base font-paragraph text-foreground hover:text-primary transition-colors py-2"
-              onClick={closeMenu}
-            >
-              Services
-            </Link>
-            <Link
-              to="/about"
-              className="text-base font-paragraph text-foreground hover:text-primary transition-colors py-2"
-              onClick={closeMenu}
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="text-base font-paragraph text-foreground hover:text-primary transition-colors py-2"
-              onClick={closeMenu}
-            >
-              Contact
-            </Link>
-          </nav>
-        </div>
-      )}
+              {/* Menu Content */}
+              <div className="pt-24 px-8 pb-8">
+                <nav className="flex flex-col gap-8">
+                  {mobileMenuLinks.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`font-paragraph text-base uppercase tracking-[0.1em] transition-all duration-200 font-light relative group ${
+                        isActive(link.path) 
+                          ? 'text-gold-accent font-medium' 
+                          : 'text-black/70 hover:text-black'
+                      }`}
+                    >
+                      {link.name}
+                      <span className={`absolute bottom-0 left-0 h-px bg-gold-accent transition-all duration-300 ${
+                        isActive(link.path) ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`} />
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

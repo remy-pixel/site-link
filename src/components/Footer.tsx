@@ -1,92 +1,102 @@
-import { Image } from '@/components/ui/image';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BaseCrudService } from '@/integrations';
+import { RestaurantInformation } from '@/entities';
+import { Instagram, MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 export default function Footer() {
+  const [restaurantInfo, setRestaurantInfo] = useState<RestaurantInformation | null>(null);
+
+  useEffect(() => {
+    loadRestaurantInfo();
+  }, []);
+
+  const loadRestaurantInfo = async () => {
+    try {
+      const result = await BaseCrudService.getAll<RestaurantInformation>('restaurantinformation');
+      if (result.items.length > 0) {
+        setRestaurantInfo(result.items[0]);
+      }
+    } catch (error) {
+      console.error('Error loading restaurant info:', error);
+    }
+  };
+
   return (
-    <footer className="bg-background border-t border-border">
-      <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
-        {/* Main Footer Content */}
-        <div className="max-w-6xl mx-auto mb-8 sm:mb-10 md:mb-12">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12 mb-8 sm:mb-10 md:mb-12">
-            {/* Brand Section */}
-            <div>
-              <Link to="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity mb-3 sm:mb-4">
-                <Image
-                  src="https://static.wixstatic.com/media/6d0f2e_b7607d5e5a424d0a928f3908784b6a62~mv2.png"
-                  width={20}
-                  height={20}
-                  className="object-contain"
-                  originWidth={30}
-                  originHeight={30}
-                  alt="StratoCS Logo"
-                />
-                <span className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-foreground">StratoCS</span>
-              </Link>
-              <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-                Clean websites. Built for growth.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-foreground font-heading font-bold mb-3 sm:mb-4 md:mb-6 text-sm md:text-base">Quick Links</h3>
-              <div className="flex flex-col gap-2 sm:gap-3">
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm">
-                  Home
-                </Link>
-                <Link to="/services" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm">
-                  Services
-                </Link>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm">
-                  About
-                </Link>
-              </div>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h3 className="text-foreground font-heading font-bold mb-3 sm:mb-4 md:mb-6 text-sm md:text-base">Contact</h3>
-              <div className="flex flex-col gap-2 sm:gap-3">
-                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm">
-                  Get in Touch
-                </Link>
-                <p className="text-muted-foreground text-xs sm:text-sm">
-                  stratocs.com
-                </p>
-              </div>
-            </div>
+    <footer className="bg-black">
+      <div className="max-w-[120rem] mx-auto px-6 md:px-12 py-20 md:py-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 mb-16 md:mb-24">
+          {/* Brand */}
+          <div>
+            <h3 className="font-heading text-xl text-white mb-4 font-light">
+              {restaurantInfo?.restaurantName || 'HOUSE OF KUA'}
+            </h3>
+            <p className="font-paragraph text-sm text-white font-light">
+              {restaurantInfo?.tagline || 'Authentic Thai Cuisine'}
+            </p>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border" />
+          {/* Hours */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Clock className="w-4 h-4 text-white flex-shrink-0" />
+              <h4 className="font-heading text-base text-white font-light">Hours</h4>
+            </div>
+            <p className="font-paragraph text-sm text-white whitespace-pre-line font-light">
+              {restaurantInfo?.openingHoursDescription || 'Mon-Sun\n17:00 - 23:00'}
+            </p>
+          </div>
+
+          {/* Address */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+              <h4 className="font-heading text-base text-white font-light">Location</h4>
+            </div>
+            <p className="font-paragraph text-sm text-white font-light">
+              {restaurantInfo?.address || 'Antwerp, Belgium'}
+            </p>
+          </div>
+
+          {/* Contact & Social */}
+          <div>
+            <h4 className="font-heading text-base text-white mb-4 font-light">Connect</h4>
+            <div className="space-y-3">
+              {restaurantInfo?.phoneNumber && (
+                <a
+                  href={`tel:${restaurantInfo.phoneNumber}`}
+                  className="flex items-center gap-3 text-white hover:text-gold-accent transition-colors"
+                >
+                  <Phone className="w-4 h-4 text-white flex-shrink-0" />
+                  <span className="font-paragraph text-sm font-light">{restaurantInfo.phoneNumber}</span>
+                </a>
+              )}
+              {restaurantInfo?.email && (
+                <a
+                  href={`mailto:${restaurantInfo.email}`}
+                  className="flex items-center gap-3 text-white hover:text-gold-accent transition-colors"
+                >
+
+                </a>
+              )}
+              {restaurantInfo?.instagramUrl && (
+                <a
+                  href={restaurantInfo.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-white hover:text-gold-accent transition-colors"
+                >
+                  <Instagram className="w-4 h-4 text-white flex-shrink-0" />
+                  <span className="font-paragraph text-sm font-light">Instagram</span>
+                </a>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Legal Links */}
-        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border">
-          <Link
-            to="/terms-and-conditions"
-            className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
-          >
-            Terms & Conditions
-          </Link>
-          <Link
-            to="/privacy-policy"
-            className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
-          >
-            Private Policy
-          </Link>
-          <Link
-            to="/accessibility-statement"
-            className="text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
-          >
-            Accessibility Statement
-          </Link>
-        </div>
-
-        {/* Copyright */}
-        <div className="text-center">
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            © 2026 stratocs.com - All Rights Reserved
+        <div className="pt-8 md:pt-12 text-center">
+          <p className="font-paragraph text-xs text-white font-light">
+            © {new Date().getFullYear()} {restaurantInfo?.restaurantName || 'House of Kua'}. All rights reserved.
           </p>
         </div>
       </div>
